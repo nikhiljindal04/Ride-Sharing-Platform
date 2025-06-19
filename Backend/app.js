@@ -1,19 +1,24 @@
-const dotenv = require('dotenv').config(); // Load environment variables from .env file
-const cors = require('cors');
+const dotenv = require("dotenv").config(); // Load environment variables from .env file
+const cors = require("cors");
 
-
-const express = require('express');
+const express = require("express");
 const app = express();
+const connectDB = require("./db/db"); // Import the database connection function
+const userRoutes = require("./routes/user.routes"); // Import user routes
+
+connectDB(); // Connect to the database
 
 app.use(cors()); // Enable CORS for all routes
+app.use(express.json()); // Parse JSON request bodies
+app.use(express.urlencoded({ extended: true })); // Parse URL-encoded request bodies
 
-app.get('/', (req, res) => {
-  res.send('Hello World!');
+app.use("/users", userRoutes);
+
+app.get("/", (req, res) => {
+  res.send("Hello World!");
 });
-app.get('/about', (req, res) => {
-  res.send('About Us');
+app.get("/about", (req, res) => {
+  res.send("About Us");
 });
-
-
 
 module.exports = app;
