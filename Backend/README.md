@@ -423,3 +423,229 @@ POST /captains/register
 - The token expires in 24 hours.
 - Password field is excluded from the response.
 - Vehicle plate number must be unique across the system.
+
+## Captain Login
+
+Authenticates a captain and returns a token.
+
+### Endpoint
+
+```
+POST /captains/login
+```
+
+### Request Body
+
+```json
+{
+  "email": "string",
+  "password": "string"
+}
+```
+
+### Validation Rules
+
+- `email`: Required, must be a valid email address
+- `password`: Required, minimum 6 characters
+
+### Example Request
+
+```json
+{
+  "email": "alice@example.com",
+  "password": "securepass"
+}
+```
+
+### Success Response
+
+- **Status Code**: 200 OK
+
+```json
+{
+  "captain": {
+    "_id": "generated_captain_id",
+    "fullName": {
+      "firstName": "Alice",
+      "lastName": "Smith"
+    },
+    "email": "alice@example.com",
+    "vehicle": {
+      "color": "Red",
+      "plate": "XYZ1234",
+      "capacity": 4,
+      "vehicleType": "car"
+    },
+    "status": "inactive"
+    // ...other captain fields
+  },
+  "token": "jwt_token_string"
+}
+```
+
+### Error Responses
+
+#### Invalid Credentials
+
+- **Status Code**: 400 Bad Request
+
+```json
+{
+  "error": "Invalid email or password"
+}
+```
+
+#### Validation Error
+
+- **Status Code**: 400 Bad Request
+
+```json
+{
+  "errors": [
+    {
+      "msg": "Invalid email address",
+      "param": "email",
+      "location": "body"
+    }
+  ]
+}
+```
+
+### Notes
+
+- The password is compared with the hashed password in the database.
+- A new JWT token is generated upon successful login.
+- The token expires in 24 hours.
+- Password field is excluded from the response.
+
+---
+
+## Get Captain Profile
+
+Returns the authenticated captain's profile information.
+
+### Endpoint
+
+```
+GET /captains/profile
+```
+
+### Headers
+
+- `Authorization: Bearer <jwt_token>` (or token cookie)
+
+### Success Response
+
+- **Status Code**: 200 OK
+
+```json
+{
+  "captain": {
+    "_id": "generated_captain_id",
+    "fullName": {
+      "firstName": "Alice",
+      "lastName": "Smith"
+    },
+    "email": "alice@example.com",
+    "vehicle": {
+      "color": "Red",
+      "plate": "XYZ1234",
+      "capacity": 4,
+      "vehicleType": "car"
+    },
+    "status": "inactive"
+    // ...other captain fields
+  }
+}
+```
+
+### Error Responses
+
+#### Unauthorized
+
+- **Status Code**: 401 Unauthorized
+
+```json
+{
+  "error": "Unauthorized"
+}
+```
+
+#### Captain Not Found
+
+- **Status Code**: 404 Not Found
+
+```json
+{
+  "error": "Captain not found"
+}
+```
+
+### Notes
+
+- Requires a valid JWT token (in cookie or Authorization header).
+- Token must not be blacklisted (i.e., not logged out).
+
+---
+
+## Captain Logout
+
+Logs out the authenticated captain by blacklisting the current token.
+
+### Endpoint
+
+```
+POST /captains/logout
+```
+
+### Headers
+
+- `Authorization: Bearer <jwt_token>` (or token cookie)
+
+### Success Response
+
+- **Status Code**: 200 OK
+
+```json
+{
+  "message": "Logged out successfully"
+}
+```
+
+### Error Responses
+
+#### No Token Provided
+
+- **Status Code**: 400 Bad Request
+
+```json
+{
+  "error": "No token provided"
+}
+```
+
+#### Unauthorized
+
+- **Status Code**: 401 Unauthorized
+
+```json
+{
+  "error": "Unauthorized"
+}
+```
+
+#### Server Error
+
+- **Status Code**: 500 Internal Server Error
+
+```json
+{
+  "message": "1 Error logging out"
+}
+```
+
+### Notes
+
+- Requires a valid JWT token (in cookie or Authorization header).
+- The token is added to a blacklist and will be rejected for future requests.
+- The token cookie is cleared on logout.

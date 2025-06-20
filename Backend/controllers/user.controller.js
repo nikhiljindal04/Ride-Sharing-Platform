@@ -28,6 +28,9 @@ module.exports.registerUser = async (req, res) => {
   });
 
   const token = await user.generateAuthToken();
+
+  // Set the token in a cookie
+  res.cookie("token", token);
   res.status(201).json({ user, token });
 };
 
@@ -46,8 +49,8 @@ module.exports.loginUser = async (req, res) => {
   }
 
   // Compare the provided password with the stored hashed password
-  const isMatch = await user.comparePassword(password);
-  if (!isMatch) {
+  const isPasswordValid = await user.comparePassword(password);
+  if (!isPasswordValid) {
     return res.status(401).json({ error: "Invalid email or password" });
   }
 
@@ -61,4 +64,16 @@ module.exports.loginUser = async (req, res) => {
 
 module.exports.getUserProfile = async (req, res) => {
   res.status(200).json(req.user);
+};
+
+module.exports.logoutUser = async (req, res) => {
+  const token = req.cookies.token || req.headers.authorization?.split(" ")[1]; // Get the token from the cookie
+  res.clearCookie("token"); // Clear the token cookie
+  try {
+    // Add the token to the blacklist
+    await blacklistToken.create({ token });
+    res.status(200).json({ message: "Logged out successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error logging out" });
+  }
 };
