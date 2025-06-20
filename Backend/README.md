@@ -292,3 +292,134 @@ POST /users/logout
 - Requires a valid JWT token (in cookie or Authorization header).
 - The token is added to a blacklist and will be rejected for future requests.
 - The token cookie is cleared on logout.
+
+## Register Captain
+
+Registers a new captain (driver) in the system.
+
+### Endpoint
+
+```
+POST /captains/register
+```
+
+### Request Body
+
+```json
+{
+  "fullName": {
+    "firstName": "string",
+    "lastName": "string" // optional
+  },
+  "email": "string",
+  "password": "string",
+  "vehicle": {
+    "color": "string",
+    "plate": "string",
+    "capacity": number,
+    "vehicleType": "car" | "bike" | "auto"
+  }
+}
+```
+
+### Validation Rules
+
+- `fullName.firstName`: Required, minimum 3 characters
+- `fullName.lastName`: Optional, minimum 3 characters if provided
+- `email`: Required, must be a valid email format
+- `password`: Required, minimum 6 characters
+- `vehicle.color`: Required, minimum 3 characters
+- `vehicle.plate`: Required, minimum 5 characters, must be unique
+- `vehicle.capacity`: Required, must be a number, minimum 1
+- `vehicle.vehicleType`: Required, must be one of `"car"`, `"bike"`, or `"auto"`
+
+### Example Request
+
+```json
+{
+  "fullName": {
+    "firstName": "Alice",
+    "lastName": "Smith"
+  },
+  "email": "alice@example.com",
+  "password": "securepass",
+  "vehicle": {
+    "color": "Red",
+    "plate": "XYZ1234",
+    "capacity": 4,
+    "vehicleType": "car"
+  }
+}
+```
+
+### Success Response
+
+- **Status Code**: 201 Created
+
+```json
+{
+  "captain": {
+    "_id": "generated_captain_id",
+    "fullName": {
+      "firstName": "Alice",
+      "lastName": "Smith"
+    },
+    "email": "alice@example.com",
+    "vehicle": {
+      "color": "Red",
+      "plate": "XYZ1234",
+      "capacity": 4,
+      "vehicleType": "car"
+    },
+    "status": "inactive"
+    // ...other captain fields
+  },
+  "token": "jwt_token_string"
+}
+```
+
+### Error Responses
+
+#### Validation Error
+
+- **Status Code**: 400 Bad Request
+
+```json
+{
+  "errors": [
+    {
+      "msg": "First name is required",
+      "param": "fullName.firstName",
+      "location": "body"
+    }
+  ]
+}
+```
+
+#### Captain Already Exists
+
+- **Status Code**: 400 Bad Request
+
+```json
+{
+  "error": "Captain already exists"
+}
+```
+
+#### Server Error
+
+- **Status Code**: 500 Internal Server Error
+
+```json
+{
+  "error": "Error creating captain"
+}
+```
+
+### Notes
+
+- The password is automatically hashed before saving.
+- A JWT token is generated and returned upon successful registration.
+- The token expires in 24 hours.
+- Password field is excluded from the response.
+- Vehicle plate number must be unique across the system.
