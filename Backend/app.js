@@ -5,12 +5,14 @@ const express = require("express");
 const app = express();
 const connectDB = require("./db/db"); // Import the database connection function
 const userRoutes = require("./routes/user.routes"); // Import user routes
+const cookieParser = require("cookie-parser"); // Import cookie parser middleware
 
 connectDB(); // Connect to the database
 
 app.use(cors()); // Enable CORS for all routes
 app.use(express.json()); // Parse JSON request bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded request bodies
+app.use(cookieParser()); // Use cookie parser middleware to handle cookies
 
 app.use("/users", userRoutes);
 

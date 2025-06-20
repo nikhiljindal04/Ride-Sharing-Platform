@@ -8,9 +8,13 @@ module.exports.registerUser = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { fullName: { firstName, lastName }, email, password } = req.body;
+  const {
+    fullName: { firstName, lastName },
+    email,
+    password,
+  } = req.body;
   const hashedPassword = await userModel.hashPassword(password);
-  
+
   console.log(req.body);
 
   const user = await userService.createUser({
@@ -30,7 +34,7 @@ module.exports.loginUser = async (req, res) => {
   }
 
   const { email, password } = req.body;
-  
+
   // Check if user exists
   const user = await userModel.findOne({ email }).select("+password");
   if (!user) {
@@ -44,5 +48,13 @@ module.exports.loginUser = async (req, res) => {
   }
 
   const token = await user.generateAuthToken();
+
+  // Set the token in a cookie
+  res.cookie("token", token);
+
   res.status(200).json({ user, token });
+};
+
+module.exports.getUserProfile = async (req, res) => {
+  res.status(200).json(req.user);
 };

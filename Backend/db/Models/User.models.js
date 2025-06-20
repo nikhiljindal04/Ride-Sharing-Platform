@@ -34,7 +34,7 @@ const UserSchema = new mongoose.Schema({
 //It creates a JWT token that includes the user’s ID and expires in 1 hour.
 UserSchema.methods.generateAuthToken = function () {
   const token = jwt.sign({ _id: this._id }, process.env.JWT_SECRET, {
-    expiresIn: "1h",
+    expiresIn: "24h",
   });
   return token;
 };

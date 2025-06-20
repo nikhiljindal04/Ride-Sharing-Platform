@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const userController = require("../controllers/user.controller");
 const { body } = require("express-validator");
+const { authenticateUser } = require("../middleware/auth.middleware");
+const blacklistToken = require("../db/Models/blacklistToken.model");
 
 router.post(
   "/register",
@@ -33,5 +35,21 @@ router.post(
   ],
   userController.loginUser
 );
+
+router.get("/profile", authenticateUser, userController.getUserProfile);
+
+// I have send the token to cookies with 24 hours expiry and then I logged out after 1 hours so I can use the same token to send the request from postman and it will works for next 23 hours untill it gets expired from my server.
+
+router.post("/logout", authenticateUser, async (req, res) => {
+  res.clearCookie("token"); // Clear the token cookie
+  const token = req.cookies.token || req.headers.authorization?.split(" ")[1]; // Get the token from the cookie
+  try {
+    // Add the token to the blacklist
+    await blacklistToken.create({ token });
+    res.status(200).json({ message: "Logged out successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error logging out" });
+  }
+});
 
 module.exports = router;
