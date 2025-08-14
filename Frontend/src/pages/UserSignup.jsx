@@ -1,23 +1,40 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState  } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import {UserDataContext} from "../context/UserContext";
 
 const UserSignup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [userData, setUserData] = useState({});
+  //const [userData, setUserData] = useState({});
+  const navigate = useNavigate();
+  const { user, setUser } = React.useContext(UserDataContext);
 
-  const submitHandler = (e) => {
+  const submitHandler = async (e) => {
     e.preventDefault();
-    setUserData({
+    const newUser ={
       fullName: {
         firstName: firstName,
-        lastName: lastName,
+        lastName: lastName
       },
       email: email,
-      password: password,
+      password: password
+    };
+
+    const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/users/register`, newUser, {
+      headers: {
+        "Content-Type": "application/json",
+      },
     });
+
+    if (response.status === 201) {
+      const data = response.data;
+      setUser(data.user);
+      localStorage.setItem("token", data.token);
+      navigate("/home");
+    }
     setEmail("");
     setPassword("");
     setFirstName("");
@@ -28,7 +45,7 @@ const UserSignup = () => {
     <div className="p-7 flex flex-col justify-between h-screen  ">
       <div>
         <img
-          className="w-16 mb-10"
+          className="w-16 mb-6"
           src="https://imgs.search.brave.com/dM7ayL6GDeUdg0B9CD0crlUFx0UiJNfkV76vRd3YMGc/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWFn/ZXMuc2Vla2xvZ28u/Y29tL2xvZ28tcG5n/LzMzLzIvdWJlci1s/b2dvLXBuZ19zZWVr/bG9nby0zMzg4NzIu/cG5n"
         ></img>
         <form

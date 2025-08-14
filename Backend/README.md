@@ -649,3 +649,300 @@ POST /captains/logout
 - Requires a valid JWT token (in cookie or Authorization header).
 - The token is added to a blacklist and will be rejected for future requests.
 - The token cookie is cleared on logout.
+
+## Maps API
+
+### Get Address Coordinates
+
+Returns latitude and longitude for a given address.
+
+#### Endpoint
+
+```
+GET /maps/mapsCoordinates
+```
+
+#### Query Parameters
+
+- `address` (string, required): The address to geocode.
+
+#### Headers
+
+- `Authorization: Bearer <jwt_token>`
+
+#### Success Response
+
+- **Status Code**: 200 OK
+
+```json
+{
+  "ltd": 23.2599,
+  "lang": 77.4126
+}
+```
+
+#### Error Responses
+
+- **Status Code**: 400 Bad Request
+
+```json
+{
+  "errors": [
+    {
+      "msg": "Address is required",
+      "param": "address",
+      "location": "query"
+    }
+  ]
+}
+```
+
+- **Status Code**: 500 Internal Server Error
+
+```json
+{
+  "error": "Failed to fetch coordinates"
+}
+```
+
+---
+
+### Get Distance and Time
+
+Returns the distance and estimated duration between two locations.
+
+#### Endpoint
+
+```
+GET /maps/get-distance-time
+```
+
+#### Query Parameters
+
+- `origin` (string, required): Origin address.
+- `destination` (string, required): Destination address.
+
+#### Headers
+
+- `Authorization: Bearer <jwt_token>`
+
+#### Success Response
+
+- **Status Code**: 200 OK
+
+```json
+{
+  "distance": {
+    "text": "5.2 km",
+    "value": 5200
+  },
+  "duration": {
+    "text": "15 mins",
+    "value": 900
+  },
+  "status": "OK"
+}
+```
+
+#### Error Responses
+
+- **Status Code**: 400 Bad Request
+
+```json
+{
+  "errors": [
+    {
+      "msg": "Origin is required",
+      "param": "origin",
+      "location": "query"
+    }
+  ]
+}
+```
+
+- **Status Code**: 500 Internal Server Error
+
+```json
+{
+  "error": "Failed to fetch distance and time"
+}
+```
+
+---
+
+### Get Address Suggestions
+
+Returns autocomplete suggestions for a given address input.
+
+#### Endpoint
+
+```
+GET /maps/get-suggestions
+```
+
+#### Query Parameters
+
+- `address` (string, required): The partial address input.
+
+#### Headers
+
+- `Authorization: Bearer <jwt_token>`
+
+#### Success Response
+
+- **Status Code**: 200 OK
+
+```json
+[
+  "Bhopal, Madhya Pradesh, India",
+  "Bhopal Junction, Bhopal, Madhya Pradesh, India"
+]
+```
+
+#### Error Responses
+
+- **Status Code**: 400 Bad Request
+
+```json
+{
+  "errors": [
+    {
+      "msg": "Address is required",
+      "param": "address",
+      "location": "query"
+    }
+  ]
+}
+```
+
+- **Status Code**: 500 Internal Server Error
+
+```json
+{
+  "error": "Failed to fetch suggestions"
+}
+```
+
+---
+
+## Ride API
+
+### Get Fare Estimate
+
+Returns fare estimates for different vehicle types between pickup and destination.
+
+#### Endpoint
+
+```
+GET /rides/get-fare
+```
+
+#### Query Parameters
+
+- `pickup` (string, required): Pickup address.
+- `destination` (string, required): Destination address.
+
+#### Headers
+
+- `Authorization: Bearer <jwt_token>`
+
+#### Success Response
+
+- **Status Code**: 200 OK
+
+```json
+{
+  "car": 120.5,
+  "auto": 80.0,
+  "motorcycle": 60.0
+}
+```
+
+#### Error Responses
+
+- **Status Code**: 400 Bad Request
+
+```json
+{
+  "message": "Pickup and destination are required"
+}
+```
+
+- **Status Code**: 500 Internal Server Error
+
+```json
+{
+  "message": "Internal server error"
+}
+```
+
+---
+
+### Create Ride
+
+Creates a new ride request.
+
+#### Endpoint
+
+```
+POST /rides/create-ride
+```
+
+#### Request Body
+
+```json
+{
+  "pickupLocation": "string",
+  "destinationLocation": "string",
+  "vehicleType": "car" | "auto" | "motorcycle"
+}
+```
+
+#### Headers
+
+- `Authorization: Bearer <jwt_token>`
+
+#### Success Response
+
+- **Status Code**: 201 Created
+
+```json
+{
+  "message": "Ride created successfully",
+  "ride": {
+    "_id": "ride_id",
+    "user": "user_id",
+    "pickupLocation": "string",
+    "destinationLocation": "string",
+    "vehicleType": "car",
+    "fare": 120.5,
+    "status": "pending",
+    "otp": "123456"
+    // ...other ride fields
+  }
+}
+```
+
+#### Error Responses
+
+- **Status Code**: 400 Bad Request
+
+```json
+{
+  "errors": [
+    {
+      "msg": "Pickup location is required",
+      "param": "pickupLocation",
+      "location": "body"
+    }
+  ]
+}
+```
+
+- **Status Code**: 500 Internal Server Error
+
+```json
+{
+  "message": "Internal server error"
+}
+```

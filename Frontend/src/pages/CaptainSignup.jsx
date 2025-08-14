@@ -1,35 +1,68 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import { CaptainDataContext } from "../context/CaptainContext";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const CaptainSignup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [captainData, setCaptainData] = useState({});
 
-  const submitHandler = (e) => {
+  const [vehicleColor, setVehicleColor] = useState("");
+  const [vehiclePlate, setVehiclePlate] = useState("");
+  const [vehicleCapacity, setVehicleCapacity] = useState("");
+  const [vehicleType, setVehicleType] = useState("");
+
+  const { captain, setCaptain } = React.useContext(CaptainDataContext);
+  const navigate = useNavigate();
+
+  const submitHandler = async (e) => {
     e.preventDefault();
-    setCaptainData({
+    const captainData = {
       fullName: {
         firstName: firstName,
         lastName: lastName,
       },
       email: email,
       password: password,
+      vehicle: {
+        color: vehicleColor,
+        plate: vehiclePlate,
+        capacity: vehicleCapacity,
+        vehicleType: vehicleType,
+      },
+    };
+
+    const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/captains/register`, captainData, {
+      headers: {
+        "Content-Type": "application/json",
+      },
     });
+
+    if (response.status === 201) {
+      setCaptain(response.data.captain);
+      localStorage.setItem("token", response.data.token);
+      navigate("/captainHome");
+
+    }
     setEmail("");
     setPassword("");
     setFirstName("");
     setLastName("");
+    setVehicleColor("");
+    setVehiclePlate("");
+    setVehicleCapacity("");
+    setVehicleType("");
   };
 
   return (
     <div className="p-7 flex flex-col justify-between h-screen  ">
       <div>
         <img
-          className="w-12 mb-10"
+          className="w-12 mb-6"
           src="https://imgs.search.brave.com/rSuSSYacx1C8jOOc6iUc_xal-ahK3vL90Pl-NKUkJSE/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9mcmVl/bG9nb3BuZy5jb20v/aW1hZ2VzL2FsbF9p/bWcvMTY1OTc2MTQy/NXViZXItZHJpdmVy/LWxvZ28tcG5nLnBu/Zw"
         ></img>
         <form
@@ -82,6 +115,49 @@ const CaptainSignup = () => {
               setPassword(e.target.value);
             }}
           />
+          <h3 className="text-base font-medium mb-2">Vehicle Details</h3>
+          <div className="flex gap-2 mb-5">
+            <input
+              required
+              className="bg-[#eeeeee] rounded px-4 py-2 w-1/2 text-lg placeholder:text-sm"
+              type="text"
+              placeholder="Vehicle Color"
+              value={vehicleColor}
+              onChange={(e) => setVehicleColor(e.target.value)}
+            />
+            <input
+              required
+              className="bg-[#eeeeee] rounded px-4 py-2 w-1/2 text-lg placeholder:text-sm"
+              type="text"
+              placeholder="Vehicle Plate"
+              value={vehiclePlate}
+              onChange={(e) => setVehiclePlate(e.target.value)}
+            />
+          </div>
+          <div className="flex gap-2 mb-5">
+            <input
+              required
+              className="bg-[#eeeeee] rounded px-4 py-2 w-1/2 text-lg placeholder:text-sm"
+              type="number"
+              min="1"
+              placeholder="Capacity"
+              value={vehicleCapacity}
+              onChange={(e) => setVehicleCapacity(e.target.value)}
+            />
+            <select
+              required
+              className="bg-[#eeeeee] rounded px-4 py-2 w-1/2 text-sm"
+              value={vehicleType}
+              onChange={(e) => setVehicleType(e.target.value)}
+            >
+              <option value="" disabled>
+                Vehicle Type
+              </option>
+              <option value="car">Car</option>
+              <option value="bike">Bike</option>
+              <option value="auto">Auto</option>
+            </select>
+          </div>
           <button className="bg-[#111] text-white w-full rounded font-semibold px-4 py-3 mb-3">
             Sign In
           </button>
@@ -95,7 +171,7 @@ const CaptainSignup = () => {
       </div>
 
       <div>
-        <p className="text-[10px] leading-tight">
+        <p className="text-[10px] leading-tight mt-6">
           This site is protected by reCAPTCHA and the <span className="underline">Google Privacy Policy</span> and
           <span className="underline">Terms of Service</span> apply.
         </p>

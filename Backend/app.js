@@ -7,6 +7,8 @@ const connectDB = require("./db/db"); // Import the database connection function
 const userRoutes = require("./routes/user.routes"); // Import user routes
 const cookieParser = require("cookie-parser"); // Import cookie parser middleware
 const captainRoutes = require("./routes/captain.routes"); // Import captain routes
+const mapsRoutes = require("./routes/maps.routes"); // Import maps routes
+const rideRoutes = require("./routes/ride.routes"); // Import ride routes
 
 connectDB(); // Connect to the database
 
@@ -17,6 +19,9 @@ app.use(cookieParser()); // Use cookie parser middleware to handle cookies
 
 app.use("/users", userRoutes);
 app.use("/captains", captainRoutes); // Use captain routes
+app.use("/maps", mapsRoutes); // Use maps routes
+app.use("/rides", rideRoutes); // Use ride routes
+
 
 app.get("/", (req, res) => {
   res.send("Hello World!");

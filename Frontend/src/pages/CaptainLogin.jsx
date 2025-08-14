@@ -1,27 +1,44 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { CaptainDataContext } from "../context/CaptainContext";
 
 const CaptainLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [captainData, setCaptainData] = useState({});
+  const navigate = useNavigate();
+  const { captain, setCaptain } = React.useContext(CaptainDataContext);
 
-  const submitHandler = (e)=> {
+  const submitHandler = async (e) => {
     e.preventDefault();
-    setCaptainData({
+    const CaptainData = {
       email: email,
       password: password,
+    };
+    const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/captains/login`, CaptainData, {
+      headers: {
+        "Content-Type": "application/json",
+      },
     });
+
+    if (response.status === 200) {
+      setCaptain(response.data.captain);
+
+      localStorage.setItem("token", response.data.token);
+      navigate("/captainHome");
+    }
+
     setEmail("");
     setPassword("");
-  }
+  };
 
   return (
     <div className="p-7 flex flex-col justify-between h-screen  ">
       <div>
         <img
-          className="w-12 mb-10"
+          className="w-12 mb-6"
           src="https://imgs.search.brave.com/rSuSSYacx1C8jOOc6iUc_xal-ahK3vL90Pl-NKUkJSE/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9mcmVl/bG9nb3BuZy5jb20v/aW1hZ2VzL2FsbF9p/bWcvMTY1OTc2MTQy/NXViZXItZHJpdmVy/LWxvZ28tcG5nLnBu/Zw"
         ></img>
         <form
@@ -29,9 +46,9 @@ const CaptainLogin = () => {
             submitHandler(e);
           }}
         >
-          <h3 className="text-xl mb-2 font-medium">What is your email</h3>
+          <h3 className="text-base mb-2 font-medium">What is your email</h3>
           <input
-            className="bg-[#eeeeee] mb-7 rounded px-4 py-2  flex w-full text-lg placeholder:text-sm"
+            className="bg-[#eeeeee] mb-7 rounded px-4 py-2  flex w-full text-lg placeholder:text-base"
             required
             value={email}
             onChange={(e) => {
@@ -40,9 +57,9 @@ const CaptainLogin = () => {
             type="email"
             placeholder="example@gmail.com"
           />
-          <h3 className="text-xl font-medium mb-2">Enter Password</h3>
+          <h3 className="text-base font-medium mb-2">Enter Password</h3>
           <input
-            className="bg-[#eeeeee] mb-7 rounded px-4 py-2  flex w-full text-lg placeholder:text-sm"
+            className="bg-[#eeeeee] mb-7 rounded px-4 py-2  flex w-full text-lg placeholder:text-base"
             required
             value={password}
             onChange={(e) => {
