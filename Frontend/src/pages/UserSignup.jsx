@@ -34,6 +34,8 @@ const UserSignup = () => {
       setUser(data.user);
       localStorage.setItem("token", data.token);
       navigate("/home");
+    }else{
+      console.log(response.data);
     }
     setEmail("");
     setPassword("");
