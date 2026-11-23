@@ -100,8 +100,6 @@ module.exports.getCaptainsInRadius = async (ltd, lng, radius) => {
   console.log("Fetching captains in radius:", { ltd, lng, radius });
   try {
     console.log(ltd, lng, radius);
-    const data = await captainModel.findById("6864d2c1aa05ba0f0d0ffd5d");
-    console.log("Data:", data.location);
     const captains = await captainModel.find({
       location: {
         $near: {

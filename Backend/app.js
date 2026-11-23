@@ -1,26 +1,26 @@
-const dotenv = require("dotenv").config(); // Load environment variables from .env file
+const dotenv = require("dotenv").config();
 const cors = require("cors");
 
 const express = require("express");
 const app = express();
-const connectDB = require("./db/db"); // Import the database connection function
-const userRoutes = require("./routes/user.routes"); // Import user routes
-const cookieParser = require("cookie-parser"); // Import cookie parser middleware
-const captainRoutes = require("./routes/captain.routes"); // Import captain routes
-const mapsRoutes = require("./routes/maps.routes"); // Import maps routes
-const rideRoutes = require("./routes/ride.routes"); // Import ride routes
+const connectDB = require("./db/db");
+const userRoutes = require("./routes/user.routes"); 
+const cookieParser = require("cookie-parser");
+const captainRoutes = require("./routes/captain.routes");
+const mapsRoutes = require("./routes/maps.routes"); 
+const rideRoutes = require("./routes/ride.routes");
 
-connectDB(); // Connect to the database
+connectDB();
 
-app.use(cors()); // Enable CORS for all routes
-app.use(express.json()); // Parse JSON request bodies
-app.use(express.urlencoded({ extended: true })); // Parse URL-encoded request bodies
-app.use(cookieParser()); // Use cookie parser middleware to handle cookies
+app.use(cors());
+app.use(express.json()); 
+app.use(express.urlencoded({ extended: true })); 
+app.use(cookieParser()); 
 
 app.use("/users", userRoutes);
-app.use("/captains", captainRoutes); // Use captain routes
-app.use("/maps", mapsRoutes); // Use maps routes
-app.use("/rides", rideRoutes); // Use ride routes
+app.use("/captains", captainRoutes); 
+app.use("/maps", mapsRoutes); 
+app.use("/rides", rideRoutes); 
 
 
 app.get("/", (req, res) => {
